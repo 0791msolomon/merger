@@ -876,6 +876,12 @@ class App extends Component {
                 </div>
                 <div className="form-group">
                   <button
+                    disabled={
+                      !this.state.business ||
+                      !this.state.state ||
+                      !this.state.city ||
+                      !this.state.address
+                    }
                     className="form-control btn-success"
                     onClick={this.fetchToken}
                   >
