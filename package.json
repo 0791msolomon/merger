@@ -8,8 +8,13 @@
     "firebase": "^5.6.0",
     "google_my_business": "^2.7.1",
     "react": "^16.6.3",
+    "react-awesome-modal": "^2.0.5",
     "react-dom": "^16.6.3",
+    "react-loading": "^2.0.3",
+    "react-loading-overlay": "^1.0.1",
     "react-places-autocomplete": "^7.2.0",
+    "react-responsive-modal": "^3.5.1",
+    "react-s-alert": "^1.4.1",
     "react-scripts": "2.1.1",
     "uuid": "^3.3.2"
   },

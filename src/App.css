@@ -1,7 +1,5 @@
-
-
-.input {
-  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.08);
+/* .input {
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
   border: honeydew;
   display: block;
   width: 100%;
@@ -13,11 +11,11 @@
 
 .autocomplete-dropdown-container {
   border-bottom: honeydew;
-    border-left: honeydew;
-    border-right: honeydew;
-    border-top: 1px solid #e6e6e6;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    border-radius: 0 0 2px 2px;
+  border-left: honeydew;
+  border-right: honeydew;
+  border-top: 1px solid #e6e6e6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border-radius: 0 0 2px 2px;
 }
 
 .suggestion-item {
@@ -25,4 +23,35 @@
   text-align: left;
   background-color: #fff;
   cursor: pointer;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+} */
+
+.formContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 60px;
+  line-height: 60px;
+  background-color: #f5f5f5;
+}
+#topLevel {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-content: center;
+  align-items: baseline;
+}
+
+#container {
+  height: 100vh;
 }
