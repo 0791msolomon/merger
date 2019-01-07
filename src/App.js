@@ -849,7 +849,7 @@ class App extends Component {
                 </div>
                 <div className="form-group">
                   <input
-                    hidden={true}
+                    // hidden={true}
                     className="form-control"
                     value={this.state.placeID}
                     placeholder="Place ID"
@@ -858,7 +858,7 @@ class App extends Component {
                 </div>
                 <div className="form-group">
                   <input
-                    hidden={true}
+                    // hidden={true}
                     className="form-control"
                     value={this.state.latitude}
                     placeholder="Latitude"
@@ -867,7 +867,7 @@ class App extends Component {
                 </div>
                 <div className="form-group">
                   <input
-                    hidden={true}
+                    // hidden={true}
                     className="form-control"
                     value={this.state.longitude}
                     placeholder="Longitude"
@@ -898,6 +898,7 @@ class App extends Component {
               </button>
             </div> */}
             </div>
+            ,
             <div className="col-5">
               <form>
                 <h3>Google My Business Information</h3>
