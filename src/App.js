@@ -61,7 +61,9 @@ class App extends Component {
   //     let item = snap.val();
   //     let narr = Object.values(item);
   //     narr.map(item => {
-  //       console.log(item);
+  //       if (!item.serviceArea && item.latlng) {
+  //         console.log(item);
+  //       }
   //     });
   //   });
   // };
@@ -199,17 +201,17 @@ class App extends Component {
       .then(res => {
         console.log(res);
         res.map(x => {
-          let placeID = x.place_id;
+          // let placeID = x.place_id;
           let formattedAddress = x.formatted_address;
           let address = formattedAddress.split(",")[0];
           let city = formattedAddress.split(",")[1];
           let formattedState = formattedAddress.split(",")[2];
           let state = formattedState.replace(/[0-9]/g, "").trim();
-          this.setState({ address, city, state, placeID });
+          this.setState({ address, city, state, finished: true });
         });
-        getLatLng(res[0]).then(n =>
-          this.setState({ latitude: n.lat, longitude: n.lng, finished: true })
-        );
+        // getLatLng(res[0]).then(n =>
+        //   this.setState({ latitude: n.lat, longitude: n.lng, finished: true })
+        // );
       })
       .catch(error => console.error("Error", error));
   };
@@ -238,24 +240,24 @@ class App extends Component {
       this.getNextPage();
     });
   };
-  // getNextPage = () => {
-  //   let { groups } = this.state;
-  //   let locations = [];
-  //   let business = this.state.business;
-  //   this.setState({ loading: true });
-  //   GMB.options({ version: "v4" });
-  //   GMB.setAccessToken(`${this.state.token}`);
-  //   GMB.api(
-  //     `accounts/115765606782133461651/locations?alt=json&pageToken=${
-  //       this.state.nextPageToken
-  //     }`,
-  //     "get",
-  //     res => {
-  //       groups.push(JSON.parse(res));
-  //       this.getData(groups);
-  //     }
-  //   );
-  // };
+  getNextPage = () => {
+    let { groups } = this.state;
+    let locations = [];
+    let business = this.state.business;
+    this.setState({ loading: true });
+    GMB.options({ version: "v4" });
+    GMB.setAccessToken(`${this.state.token}`);
+    GMB.api(
+      `accounts/115765606782133461651/locations?alt=json&pageToken=${
+        this.state.nextPageToken
+      }`,
+      "get",
+      res => {
+        groups.push(JSON.parse(res));
+        this.getData(groups);
+      }
+    );
+  };
 
   getData = groups => {
     let { business } = this.state;
@@ -264,10 +266,23 @@ class App extends Component {
       location &&
         location.map(y => {
           let locationInfo = [];
+          let latitude, longitude;
           if (y.locationName.includes(business)) {
             locationInfo.push(y);
             let phonenumber = y.primaryPhone;
             let website = y.websiteUrl;
+            let placeID = y.locationKey.placeId;
+            if (y.serviceArea && y.serviceArea.radius) {
+              latitude = y.serviceArea.radius.latlng.latitude;
+              longitude = y.serviceArea.radius.latlng.longitude;
+            } else if (y.latlng) {
+              latitude = y.latlng.latitude;
+              longitude = y.latlng.longitude;
+            } else {
+              latitude = 38.8977;
+              longitude = 77.0365;
+            }
+
             locationInfo.map(z => {
               let name = z.name;
               let locationID = name.split("/")[3];
@@ -280,6 +295,9 @@ class App extends Component {
                 offset: 100
               });
               this.setState({
+                placeID,
+                latitude,
+                longitude,
                 locationID,
                 website,
                 phonenumber,
@@ -288,77 +306,95 @@ class App extends Component {
             });
           }
         });
+      if (this.state.loading) {
+        this.setState(
+          {
+            loading: false
+          },
+          () => {
+            Alert.error("Unable to find GMB info", {
+              position: "top-right",
+              effect: "jelly",
+              onShow: function() {},
+              beep: false,
+              timeout: 1000,
+              offset: 100
+            });
+          }
+        );
+      }
     });
   };
 
-  getNextPage = () => {
-    let { groups } = this.state;
-    let locations = [];
-    let business = this.state.business;
-    this.setState({ loading: true });
-    GMB.options({ version: "v4" });
-    GMB.setAccessToken(`${this.state.token}`);
-    GMB.api(
-      `accounts/115765606782133461651/locations?pageToken=ABHRLXXiYMObqDx6VBEwJoz9VoqCyVJoXlu78c-N6moRKdGRIpybgDC-JJWQfYRrxvFzhbHYxwRK7GVSo8RX6HdWsOTTkGWYBcSBs_3mcYzMq_-w10QYYde-HKLekS3KnIrxlaJ_l0gChkxWMnCbJxnqy1TfsTfCbA`,
-      "get",
-      res => {
-        groups.push(JSON.parse(res));
-        console.log(groups);
-        groups.map(x => {
-          let location = x.locations;
-          location &&
-            location.map(y => {
-              let locationInfo = [];
-              if (y.locationName.includes(business)) {
-                locationInfo.push(y);
-                let phonenumber = y.primaryPhone;
-                let website = y.websiteUrl;
-                locationInfo.map(z => {
-                  let name = z.name;
-                  let locationID = name.split("/")[3];
+  // getNextPage = () => {
+  //   let { groups } = this.state;
+  //   let locations = [];
+  //   let business = this.state.business;
+  //   this.setState({ loading: true });
+  //   GMB.options({ version: "v4" });
+  //   GMB.setAccessToken(`${this.state.token}`);
+  //   GMB.api(
+  //     `accounts/115765606782133461651/locations?pageToken=ABHRLXXiYMObqDx6VBEwJoz9VoqCyVJoXlu78c-N6moRKdGRIpybgDC-JJWQfYRrxvFzhbHYxwRK7GVSo8RX6HdWsOTTkGWYBcSBs_3mcYzMq_-w10QYYde-HKLekS3KnIrxlaJ_l0gChkxWMnCbJxnqy1TfsTfCbA`,
+  //     "get",
+  //     res => {
+  //       groups.push(JSON.parse(res));
+  //       console.log(groups);
+  //       groups.map(x => {
+  //         let location = x.locations;
+  //         location &&
+  //           location.map(y => {
+  //             let locationInfo = [];
+  //             if (y.locationName.includes(business)) {
+  //               console.log("look here ", y);
+  //               locationInfo.push(y);
+  //               let phonenumber = y.primaryPhone;
+  //               let website = y.websiteUrl;
+  //               locationInfo.map(z => {
+  //                 let name = z.name;
+  //                 let locationID = name.split("/")[3];
 
-                  return this.setState(
-                    {
-                      locationID,
-                      website,
-                      phonenumber,
-                      loading: false
-                    },
-                    () => {
-                      Alert.success("Located GMB info", {
-                        position: "top-right",
-                        effect: "jelly",
-                        onShow: function() {},
-                        beep: false,
-                        timeout: 1000,
-                        offset: 100
-                      });
-                    }
-                  );
-                });
-              }
-            });
-          if (this.state.loading) {
-            this.setState(
-              {
-                loading: false
-              },
-              () => {
-                Alert.error("Unable to find GMB info", {
-                  position: "top-right",
-                  effect: "jelly",
-                  onShow: function() {},
-                  beep: false,
-                  timeout: 1000,
-                  offset: 100
-                });
-              }
-            );
-          }
-        });
-      }
-    );
-  };
+  //                 return this.setState(
+  //                   {
+  //                     locationID,
+  //                     website,
+  //                     phonenumber,
+  //                     loading: false
+  //                   },
+  //                   () => {
+  //                     Alert.success("Located GMB info", {
+  //                       position: "top-right",
+  //                       effect: "jelly",
+  //                       onShow: function() {},
+  //                       beep: false,
+  //                       timeout: 1000,
+  //                       offset: 100
+  //                     });
+  //                   }
+  //                 );
+  //               });
+  //             }
+  //           });
+  //         if (this.state.loading) {
+  // this.setState(
+  //   {
+  //     loading: false
+  //   },
+  //   () => {
+  //     Alert.error("Unable to find GMB info", {
+  //       position: "top-right",
+  //       effect: "jelly",
+  //       onShow: function() {},
+  //       beep: false,
+  //       timeout: 1000,
+  //       offset: 100
+  //     });
+  //             }
+  //           );
+  //         }
+  //       });
+  //     }
+  //   );
+  // };
 
   checkClient = e => {
     e.preventDefault();
@@ -414,9 +450,7 @@ class App extends Component {
                   ? Alert.success("GMB verified!", {
                       position: "top-right",
                       effect: "jelly",
-                      onShow: function() {
-                        console.log("aye!");
-                      },
+                      onShow: function() {},
                       beep: false,
                       timeout: 1000,
                       offset: 100
@@ -424,9 +458,7 @@ class App extends Component {
                   : Alert.error("Unable to find reviews", {
                       position: "top-right",
                       effect: "jelly",
-                      onShow: function() {
-                        console.log("found!");
-                      },
+                      onShow: function() {},
                       beep: false,
                       timeout: 1000,
                       offset: 100
@@ -534,9 +566,7 @@ class App extends Component {
         Alert.error("Unable to create user", {
           position: "top-right",
           effect: "jelly",
-          onShow: function() {
-            console.log("found!");
-          },
+          onShow: function() {},
           beep: false,
           timeout: 1000,
           offset: 100
@@ -567,9 +597,7 @@ class App extends Component {
           Alert.success("Business ID matched", {
             position: "top-right",
             effect: "jelly",
-            onShow: function() {
-              console.log("aye!");
-            },
+            onShow: function() {},
             beep: false,
             timeout: 1000,
             offset: 100
@@ -581,9 +609,7 @@ class App extends Component {
           Alert.error("Could not match that name", {
             position: "top-right",
             effect: "jelly",
-            onShow: function() {
-              console.log("aye!");
-            },
+            onShow: function() {},
             beep: false,
             timeout: 1000,
             offset: 100
@@ -665,9 +691,7 @@ class App extends Component {
                 Alert.success("Client Successfully Added", {
                   position: "top-right",
                   effect: "jelly",
-                  onShow: function() {
-                    console.log("aye!");
-                  },
+                  onShow: function() {},
                   beep: false,
                   timeout: 1000,
                   offset: 100
@@ -683,9 +707,7 @@ class App extends Component {
             Alert.error("Unable to add client", {
               position: "top-right",
               effect: "jelly",
-              onShow: function() {
-                console.log("aye!");
-              },
+              onShow: function() {},
               beep: false,
               timeout: 1000,
               offset: 100
@@ -847,33 +869,7 @@ class App extends Component {
                     }
                   />
                 </div>
-                <div className="form-group">
-                  <input
-                    // hidden={true}
-                    className="form-control"
-                    value={this.state.placeID}
-                    placeholder="Place ID"
-                    onChange={e => this.setState({ placeID: e.target.value })}
-                  />
-                </div>
-                <div className="form-group">
-                  <input
-                    // hidden={true}
-                    className="form-control"
-                    value={this.state.latitude}
-                    placeholder="Latitude"
-                    onChange={e => this.setState({ latitude: e.target.value })}
-                  />
-                </div>
-                <div className="form-group">
-                  <input
-                    // hidden={true}
-                    className="form-control"
-                    value={this.state.longitude}
-                    placeholder="Longitude"
-                    onChange={e => this.setState({ longitude: e.target.value })}
-                  />
-                </div>
+
                 <div className="form-group">
                   <button
                     disabled={
@@ -898,7 +894,7 @@ class App extends Component {
               </button>
             </div> */}
             </div>
-            ,
+
             <div className="col-5">
               <form>
                 <h3>Google My Business Information</h3>
@@ -931,11 +927,41 @@ class App extends Component {
                   />
                 </div>
                 <div className="form-group">
+                  <input
+                    // hidden={true}
+                    className="form-control"
+                    value={this.state.placeID}
+                    placeholder="* Place ID"
+                    onChange={e => this.setState({ placeID: e.target.value })}
+                  />
+                </div>
+                <div className="form-group">
+                  <input
+                    // hidden={true}
+                    className="form-control"
+                    value={this.state.latitude}
+                    placeholder="* Latitude"
+                    onChange={e => this.setState({ latitude: e.target.value })}
+                  />
+                </div>
+                <div className="form-group">
+                  <input
+                    // hidden={true}
+                    className="form-control"
+                    value={this.state.longitude}
+                    placeholder="* Longitude"
+                    onChange={e => this.setState({ longitude: e.target.value })}
+                  />
+                </div>
+                <div className="form-group">
                   <button
                     className={
                       this.state.website &&
                       this.state.locationID &&
-                      this.state.phonenumber
+                      this.state.phonenumber &&
+                      this.state.latitude &&
+                      this.state.longitude &&
+                      this.state.placeID
                         ? "form-control btn-success"
                         : "form-control btn-warning"
                     }
@@ -943,13 +969,19 @@ class App extends Component {
                     disabled={
                       !this.state.website ||
                       !this.state.locationID ||
-                      !this.state.phonenumber
+                      !this.state.phonenumber ||
+                      this.state.latitude ||
+                      this.state.longitude ||
+                      this.state.placeID
                     }
                   >
                     {!this.state.website ||
                     !this.state.locationID ||
-                    !this.state.phonenumber
-                      ? "Enter required fields"
+                    !this.state.phonenumber ||
+                    !this.state.latitude ||
+                    !this.state.longitude ||
+                    !this.state.placeID
+                      ? "Enter required fields *"
                       : "Test Account"}
                   </button>
                 </div>
