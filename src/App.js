@@ -54,19 +54,17 @@ class App extends Component {
       to = x.val();
       console.log(to);
     });
-    // this.checkCompany();
+    this.checkCompany();
   }
-  // checkCompany = () => {
-  //   db.ref("companies").once("value", snap => {
-  //     let item = snap.val();
-  //     let narr = Object.values(item);
-  //     narr.map(item => {
-  //       if (!item.serviceArea && item.latlng) {
-  //         console.log(item);
-  //       }
-  //     });
-  //   });
-  // };
+  checkCompany = () => {
+    db.ref("companies").once("value", snap => {
+      let item = snap.val();
+      let narr = Object.values(item);
+      narr.map(item => {
+        console.log(item.name);
+      });
+    });
+  };
 
   // getFacebook = () => {
   //   db.ref(`companies`).once("value", snap => {
@@ -970,9 +968,9 @@ class App extends Component {
                       !this.state.website ||
                       !this.state.locationID ||
                       !this.state.phonenumber ||
-                      this.state.latitude ||
-                      this.state.longitude ||
-                      this.state.placeID
+                      !this.state.latitude ||
+                      !this.state.longitude ||
+                      !this.state.placeID
                     }
                   >
                     {!this.state.website ||
