@@ -61,9 +61,7 @@ class App extends Component {
     db.ref("companies").once("value", snap => {
       let item = snap.val();
       let narr = Object.values(item);
-      narr.map(item => {
-        console.log(item.name);
-      });
+      console.log(narr.length);
     });
   };
 
@@ -236,13 +234,16 @@ class App extends Component {
     GMB.setAccessToken(`${this.state.token}`);
     GMB.api(`accounts/115765606782133461651/locations`, "get", res => {
       groups.push(JSON.parse(res));
-      this.getNextPage();
+      this.setState({ nextPageToken: JSON.parse(res).nextPageToken }, () => {
+        this.getNextPage();
+      });
     });
   };
   getNextPage = () => {
     let { groups } = this.state;
     let locations = [];
     let business = this.state.business;
+    console.log("token here", this.state.nextPageToken);
     this.setState({ loading: true });
     GMB.options({ version: "v4" });
     GMB.setAccessToken(`${this.state.token}`);
@@ -260,13 +261,17 @@ class App extends Component {
 
   getData = groups => {
     let { business } = this.state;
+    let group1 = groups[0].locations;
+    let group2 = groups[1].locations;
+    let allGroups = group1.concat(group2);
+    console.log(allGroups);
     groups.map(x => {
       let location = x.locations;
       location &&
         location.map(y => {
           let locationInfo = [];
           let latitude, longitude;
-          if (y.locationName.includes(business)) {
+          if (y.locationName.toUpperCase().includes(business.toUpperCase())) {
             locationInfo.push(y);
             let phonenumber = y.primaryPhone;
             let website = y.websiteUrl;
