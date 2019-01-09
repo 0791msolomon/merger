@@ -38,7 +38,8 @@ class App extends Component {
     checked: false,
     businessIdButton: false,
     addEmployee: false,
-    loading: false
+    loading: false,
+    gmbVerified: false
   };
 
   handleChange = business => {
@@ -470,6 +471,7 @@ class App extends Component {
 
   createClient = () => {
     const {
+      gmbVerified,
       email,
       firstName,
       password,
@@ -523,6 +525,7 @@ class App extends Component {
                 longitude: parseFloat(longitude),
                 latitude: parseFloat(latitude)
               },
+              isGmbVerified: gmbVerified,
               website,
               placeID,
               locationID: locationID ? locationID : null,
