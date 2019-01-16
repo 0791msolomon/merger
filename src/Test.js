@@ -6,8 +6,7 @@ const fs = require("fs");
     const REVIEW_BUTTON_CLASS = "button.jqnFjrOWMVU__button.gm2-caption";
     const REVIEW_TITLE = "span.section-review-text";
     const SITE_LINK =
-      "https://www.google.com/maps/place/Option+One+Plumbing/@33.435551,-113.1364488,8z/data=!3m1!4b1!4m5!3m4!1s0x872b121f54dc7d89:0x900cee00fa47beae!8m2!3d33.4382788!4d-112.0178286";
-
+      "https://www.google.com/maps/place/Specialized+Pipe+Technologies+-+Naples/@26.2160278,-81.7814617,17z/data=!3m1!4b1!4m5!3m4!1s0x88db1e762e4cca49:0x816b09d577c56fb3!8m2!3d26.216023!4d-81.779273";
     const extractTotalReviewCount = () => {
       const reviewButton = document
         .querySelector("button.jqnFjrOWMVU__button.gm2-caption")
@@ -26,7 +25,7 @@ const fs = require("fs");
     };
 
     const scrapeInfiniteScrollItems = async page => {
-      let totalReviewCount = 111; //await page.evaluate(extractTotalReviewCount);
+      let totalReviewCount = 3; //await page.evaluate(extractTotalReviewCount);
       let _reviewCount = await page.evaluate(extractReviewCount);
 
       while (totalReviewCount > _reviewCount) {

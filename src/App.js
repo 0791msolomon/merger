@@ -16,6 +16,7 @@ import "react-s-alert/dist/s-alert-default.css";
 import "react-s-alert/dist/s-alert-css-effects/jelly.css";
 import Modal from "react-responsive-modal";
 import LoadingOverlay from "react-loading-overlay";
+import { firebase } from "./auth";
 
 const companyID = uuid();
 
@@ -55,14 +56,118 @@ class App extends Component {
       to = x.val();
       console.log(to);
     });
-    this.checkCompany();
+    // this.checkCompany();
+    this.checkemails();
   }
+  checkemails = () => {
+    db.ref("companies/f90629e0-9909-483b-924d-125b7d7cc53f/employees").once(
+      "value",
+      snap => {
+        let item = Object.values(snap.val());
+        console.log(item);
+        // item.map(item => console.log(item.bID));
+      }
+    );
+  };
   checkCompany = () => {
     db.ref("companies").once("value", snap => {
       let item = snap.val();
       let narr = Object.values(item);
-      console.log(narr.length);
+      narr.map(item => console.log(item.name));
     });
+  };
+
+  sign = () => {
+    let email = "fakeemail@fake.com";
+    let password = "sptdania19";
+
+    let business = "Specialized Pipe Technologies - Dania Beach";
+    let name = "fakeName";
+
+    let city = "Dania Beach";
+    let state = "FL";
+    let street = "3019 Ravenswood Road Unit 102";
+    let phonenumber = "(800) 849-4610";
+
+    let latitude = 26.084327;
+    let longitude = -80.171284;
+
+    let facebookLink = "https://www.facebook.com/sptpiping/";
+    let placeID = "ChIJs96JQ6cA2YgRDisG424-HWk";
+    let website = "https://sptpipe.com/locations/miami-fl/";
+
+    firebase
+      .auth()
+      .createUserWithEmailAndPassword(email, password)
+      .then(user => {
+        console.log(user.user.uid);
+        firebase
+          .database()
+          .ref(`users/${user.user.uid}`)
+          .set({
+            admin: true,
+            avatar:
+              "https://gordonswindowdecor.com/wp-content/uploads/sites/23/2015/06/person-placeholder.png",
+            bID: [companyID],
+            business,
+            email,
+            isVerified: true,
+            name,
+            reviewInvites: 0,
+            settings: {
+              browserNotifications: false,
+              defaultSettings: true,
+              emailNotifications: true,
+              facebook: false,
+              reviewNotifications: false,
+              twitter: false
+            },
+            username: name
+          })
+          .then(() =>
+            firebase
+              .database()
+              .ref(`companies/${companyID}`)
+              .set({
+                address: {
+                  city,
+                  state,
+                  latitude,
+                  longitude,
+                  phonenumber,
+                  street
+                },
+                facebookLink,
+                isVerified: false,
+                name: business,
+                placeID,
+                reviews: "1",
+                tier: "pro",
+                website
+              })
+          )
+          .then(() => {
+            firebase
+              .database()
+              .ref(`companies/${companyID}/employees/${user.user.uid}`)
+              .set({
+                avatar:
+                  "https://gordonswindowdecor.com/wp-content/uploads/sites/23/2015/06/person-placeholder.png",
+                email,
+                id: user.user.uid,
+                name,
+                reviewCounts: 0,
+                reviewInvites: 0,
+                username: name
+              });
+          })
+          .then(() => {
+            console.log("finished", companyID);
+          })
+          .catch(() => {
+            console.log("fail");
+          });
+      });
   };
 
   // getFacebook = () => {
@@ -530,7 +635,7 @@ class App extends Component {
                 longitude: parseFloat(longitude),
                 latitude: parseFloat(latitude)
               },
-              isGmbVerified: gmbVerified,
+              isVerified: gmbVerified,
               website,
               placeID,
               locationID: locationID ? locationID : null,
@@ -674,16 +779,20 @@ class App extends Component {
             username: firstName
           })
           .then(() =>
-            db.ref(`companies/${bID}/employees/${userID}`).set({
-              avatar:
-                "https://gordonswindowdecor.com/wp-content/uploads/sites/23/2015/06/person-placeholder.png",
-              email,
-              id: userID,
-              name: firstName,
-              reviewCounts: 0,
-              reviewInvites: 0,
-              username: firstName
-            })
+            db
+              .ref(
+                `companies/f90629e0-9909-483b-924d-125b7d7cc53f/employees/${userID}`
+              )
+              .set({
+                avatar:
+                  "https://gordonswindowdecor.com/wp-content/uploads/sites/23/2015/06/person-placeholder.png",
+                email,
+                id: userID,
+                name: firstName,
+                reviewCounts: 0,
+                reviewInvites: 0,
+                username: firstName
+              })
           )
           .then(() => {
             this.setState(
@@ -723,6 +832,13 @@ class App extends Component {
       });
   };
 
+  findUserId = () => {
+    db.ref(`companies`).once("value", snap => {
+      let item = snap.val();
+      item.forEach(item => console.log(item.employees));
+    });
+  };
+
   render() {
     return (
       <LoadingOverlay
@@ -731,6 +847,21 @@ class App extends Component {
         text="Searching GMB info..."
       >
         <div id="container">
+          {/* <button onClick={this.sign}> sign company</button> */}
+          <div className="col-4">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Employee Name"
+              value={this.state.searchForName}
+              onChange={e => this.setState({ searchForName: e.target.value })}
+            />
+            <button className="form-control btn-info" onClick={this.findUserId}>
+              Find User ID
+            </button>
+            <p>{this.state.searchUserId}</p>
+          </div>
+
           {/* <div className="col-6">
             <label htmlFor="">company name</label>
             <input
@@ -994,7 +1125,7 @@ class App extends Component {
               </form>
               {this.state.gmbVerified && (
                 <p>
-                  <strong>GMB Verified &#9989;</strong>
+                  <strong>isVerified &#9989;</strong>
                 </p>
               )}
               {this.state.reviewCount && this.state.hasChecked ? (
@@ -1115,7 +1246,7 @@ class App extends Component {
                     <div>
                       <input
                         className="form-control"
-                        value={this.state.bID}
+                        value="f90629e0-9909-483b-924d-125b7d7cc53f"
                         onChange={e => this.setState({ bID: e.target.value })}
                         placeholder="Business ID"
                       />
@@ -1152,12 +1283,12 @@ class App extends Component {
                   </div>
                   <br />
                   <button
-                    disabled={
-                      !this.state.password ||
-                      !this.state.email ||
-                      !this.state.firstName ||
-                      !this.state.bID
-                    }
+                    // disabled={
+                    //   !this.state.password ||
+                    //   !this.state.email ||
+                    //   !this.state.firstName ||
+                    //   !this.state.bID
+                    // }
                     className={
                       this.state.password &&
                       this.state.email &&
