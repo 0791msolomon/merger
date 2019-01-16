@@ -1246,7 +1246,7 @@ class App extends Component {
                     <div>
                       <input
                         className="form-control"
-                        value="f90629e0-9909-483b-924d-125b7d7cc53f"
+                        value={this.state.bID}
                         onChange={e => this.setState({ bID: e.target.value })}
                         placeholder="Business ID"
                       />
@@ -1283,12 +1283,12 @@ class App extends Component {
                   </div>
                   <br />
                   <button
-                    // disabled={
-                    //   !this.state.password ||
-                    //   !this.state.email ||
-                    //   !this.state.firstName ||
-                    //   !this.state.bID
-                    // }
+                    disabled={
+                      !this.state.password ||
+                      !this.state.email ||
+                      !this.state.firstName ||
+                      !this.state.bID
+                    }
                     className={
                       this.state.password &&
                       this.state.email &&
