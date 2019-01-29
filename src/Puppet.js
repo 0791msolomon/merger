@@ -17,11 +17,14 @@ async function run() {
   const searchButtonSelector =
     "#root > div > div > div > div:nth-child(1) > header > div > form > div.jss103.jss111.jss122.styles__MobileSearchContainerGrid-sc-16icuas-0.hXIrFd > div:nth-child(2) > button > span.jss52";
   const loadAllReviews =
-    "#root > div > div > div > div.styles__GridPageContent-sc-1v5yf99-1.knBmOf.styles__GridPageSection-sc-1v5yf99-0.iCoLBc > div.styles__DivBand-sc-1bzibaw-0.ejolzQ > div > div > div:nth-child(2) > div > div:nth-child(2) > div > div.jss320.PrintableElement-sc-1p7e3o8-0.gastqh.styles__CardActionsSmall-sc-1mvo7z-0.iauusJ > a";
+    "#root > div > div > div > div.styles__GridPageContent-sc-1v5yf99-1.knBmOf.styles__GridPageSection-sc-1v5yf99-0.iCoLBc > div.styles__DivBand-sc-1bzibaw-0.dzMrgS > div:nth-child(2) > div.jss1.jss25 > div:nth-child(2) > div > div:nth-child(3) > div > div > div > div:nth-child(2) > div > div > div:nth-child(1) > div:nth-child(2) > p > a";
+
   const loadMoreReviews =
     "#root > div > div > div > div.styles__GridPageContent-sc-1v5yf99-1.knBmOf.styles__GridPageSection-sc-1v5yf99-0.iCoLBc > div > div:nth-child(6) > div > div.jss2.jss41.jss65.Grid__PrintGrid-hz6p1r-0.dGJnOL.PrintableElement-sc-1p7e3o8-0.daaxjJ > div:nth-child(6) > button";
   const browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
+  page.on("console", consoleObj => console.log(consoleObj.text()));
+
   const isElementVisible = async (page, cssSelector) => {
     let visible = true;
     await page
@@ -63,20 +66,40 @@ async function run() {
 
     await page
       .waitForSelector(
-        "#root > div > div > div > div.styles__GridPageContent-sc-1v5yf99-1.knBmOf.styles__GridPageSection-sc-1v5yf99-0.iCoLBc > div.styles__DivBand-sc-1bzibaw-0.ejolzQ > div > div > div:nth-child(2) > div > div:nth-child(2) > div > div.jss320.PrintableElement-sc-1p7e3o8-0.gastqh.styles__CardActionsSmall-sc-1mvo7z-0.iauusJ > a",
+        "#root > div > div > div > div.styles__GridPageContent-sc-1v5yf99-1.knBmOf.styles__GridPageSection-sc-1v5yf99-0.iCoLBc > div.styles__DivBand-sc-1bzibaw-0.dzMrgS > div:nth-child(2) > div.jss1.jss25 > div:nth-child(2) > div > div:nth-child(3) > div > div > div > div:nth-child(2) > div > div > div:nth-child(1) > div:nth-child(2) > p > a",
         { timeout: 3000 }
       )
-      .then(() => page.click(loadAllReviews))
+      .then(() => {
+        page.click(loadAllReviews);
+      })
       .catch(() => {
         //RETURN NO REVIEWS AT THIS POINT
         console.log("no love");
-        // browser.close();
+        browser.close();
       });
+
+    await page.evaluate(() => {
+      document
+        .querySelectorAll(
+          "dtm-read-more.jss361.styles__LinkStyled-sc-1yozr49-0.eyfwAI"
+        )
+        .forEach(item => {
+          console.log(item.textContent);
+        });
+    });
     let loadMoreVisible = await isElementVisible(page, loadMoreReviews);
     while (loadMoreVisible) {
       await page.click(loadMoreReviews).catch(() => {});
       loadMoreVisible = await isElementVisible(page, loadMoreReviews);
     }
+    const housingDivs = "#\34 6872225 > div";
+    let listLength = await page.evaluate(sel => {
+      return document.getElementsByClassName(
+        "jss2.styles__ReviewWrapper-sc-179a6lc-1.eXrTUG"
+      ).length;
+    }, housingDivs);
+    console.log(listLength);
+    // browser.close();
   } catch (e) {
     console.log(e);
   }
