@@ -4,10 +4,10 @@ async function run() {
   const initialInput = "#mobileFauxInput";
   const clearArea =
     "#root > div > div > div > div:nth-child(1) > header > div > form > div.jss103.jss111.jss122.styles__MobileSearchContainerGrid-sc-16icuas-0.hXIrFd > div:nth-child(4) > div > div > button > svg";
-  //   const business = "chad love services";
-  //   const businessLocation = "concord, nc";
-  const business = "microsoft";
-  const businessLocation = "Redmond, WA";
+  const business = "chad love services";
+  const businessLocation = "concord, nc";
+  //   const business = "microsoft";
+  //   const businessLocation = "Redmond, WA";
   //   const business = "dominos";
   //   const businessLocation = "Milwaukee, WI";
   //   const businessNumber='(704) 793-1099'
@@ -53,11 +53,13 @@ async function run() {
       document
         .querySelectorAll(".dtm-search-listing-phone")
         .forEach(function(element) {
-          if (element.textContent === "(425) 882-8080") {
+          if (element.textContent === "(704) 793-1099") {
             element.parentNode.click();
           }
         })
     );
+
+    await page.waitForNavigation();
 
     await page
       .waitForSelector(
@@ -68,7 +70,7 @@ async function run() {
       .catch(() => {
         //RETURN NO REVIEWS AT THIS POINT
         console.log("no love");
-        browser.close();
+        // browser.close();
       });
     let loadMoreVisible = await isElementVisible(page, loadMoreReviews);
     while (loadMoreVisible) {
