@@ -1,5 +1,5 @@
 {
-  "window.zoomLevel": 0,
+  "window.zoomLevel": -1,
   "editor.formatOnSave": true,
   "javascript.updateImportsOnFileMove.enabled": "always",
   "emmet.triggerExpansionOnTab": true,

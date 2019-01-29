@@ -60,14 +60,14 @@ class App extends Component {
     this.checkemails();
   }
   checkemails = () => {
-    db.ref("companies/f90629e0-9909-483b-924d-125b7d7cc53f/employees").once(
-      "value",
-      snap => {
-        let item = Object.values(snap.val());
-        console.log(item);
-        // item.map(item => console.log(item.bID));
-      }
-    );
+    // db.ref("companies/f90629e0-9909-483b-924d-125b7d7cc53f/employees").once(
+    //   "value",
+    //   snap => {
+    //     let item = Object.values(snap.val());
+    //     console.log(item);
+    //     // item.map(item => console.log(item.bID));
+    //   }
+    // );
   };
   checkCompany = () => {
     db.ref("companies").once("value", snap => {
@@ -78,24 +78,23 @@ class App extends Component {
   };
 
   sign = () => {
-    let email = "fakeemail@fake.com";
-    let password = "sptdania19";
+    let email = 'info@plumbproservices.com'
+    let password = 'plumbpro19'
 
-    let business = "Specialized Pipe Technologies - Dania Beach";
-    let name = "fakeName";
-
-    let city = "Dania Beach";
-    let state = "FL";
-    let street = "3019 Ravenswood Road Unit 102";
-    let phonenumber = "(800) 849-4610";
-
-    let latitude = 26.084327;
-    let longitude = -80.171284;
-
-    let facebookLink = "https://www.facebook.com/sptpiping/";
-    let placeID = "ChIJs96JQ6cA2YgRDisG424-HWk";
-    let website = "https://sptpipe.com/locations/miami-fl/";
-
+    let business = "PlumbPRO Services"
+    let name = 'Amanda Joy'
+  
+    let city = 'Ambler'
+    let state = 'PA'
+    let street = 'Ambler, PA 19002, USA'
+    let phonenumber = '(484) 222 0689'
+  
+    let latitude = 40.1054485
+    let longitude = -75.2942502
+  
+    let facebookLink = 'https://www.facebook.com/plumbproservices484/'
+    let placeID = 'ChIJ2aWGNzi7xokRgesCgOjhL0k'
+    let website = 'https://plumbpro-services.business.site/'
     firebase
       .auth()
       .createUserWithEmailAndPassword(email, password)
@@ -847,7 +846,7 @@ class App extends Component {
         text="Searching GMB info..."
       >
         <div id="container">
-          {/* <button onClick={this.sign}> sign company</button> */}
+          <button onClick={this.sign}> sign company</button>
           <div className="col-4">
             <input
               type="text"
