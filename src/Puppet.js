@@ -1,4 +1,5 @@
 const puppeteer = require("puppeteer");
+const fs = require("fs");
 
 async function run() {
   const initialInput = "#mobileFauxInput";
@@ -92,13 +93,44 @@ async function run() {
       await page.click(loadMoreReviews).catch(() => {});
       loadMoreVisible = await isElementVisible(page, loadMoreReviews);
     }
-    const housingDivs = "#\34 6872225 > div";
-    let listLength = await page.evaluate(sel => {
-      return document.getElementsByClassName(
-        "jss2.styles__ReviewWrapper-sc-179a6lc-1.eXrTUG"
-      ).length;
-    }, housingDivs);
-    console.log(listLength);
+
+    const customerReviews = await page.evaluate(() => {
+      let reviewsArray = [];
+      let elements = document.getElementsByClassName(
+        "jss2 styles__ReviewWrapper-sc-179a6lc-1 eXrTUG"
+      );
+      //   for (let element of elements) {
+      //     reviewsArray.push(element);
+      //   }
+      //   for (var i = 0; i < priceEls.length; i++) {
+      //     var price = priceEls[i].innerText;
+      //     alert("Price: " + price);
+      //   }
+
+      elements.forEach(element => {
+        console.log(
+          element.querySelector(
+            ".jss214.jss222.jss241.styles__ReviewText-sc-179a6lc-0.leFlhE"
+          ).textContent
+        );
+      });
+
+      // console.log(element.textContent);
+
+      // reviews.forEach(review => {
+      //   titles.push({
+      //     author: review.querySelector(".section-review-title").textContent,
+      //     body: review.querySelector(".section-review-text").textContent,
+      //     time: review.querySelector(".section-review-publish-date")
+      //       .textContent,
+      //     avatar,
+      //     source: "Google",
+      //     rank: parseFloat(rank)
+      //   });
+      // });
+      return reviewsArray;
+    });
+    console.log(customerReviews);
     // browser.close();
   } catch (e) {
     console.log(e);
