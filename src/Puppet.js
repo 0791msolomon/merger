@@ -5,12 +5,12 @@ async function run() {
   const initialInput = "#mobileFauxInput";
   const clearArea =
     "#root > div > div > div > div:nth-child(1) > header > div > form > div.jss103.jss111.jss122.styles__MobileSearchContainerGrid-sc-16icuas-0.hXIrFd > div:nth-child(4) > div > div > button > svg";
-  const business = "chad love services";
-  const businessLocation = "concord, nc";
+  const business = "K & S Heating and Air";
+  const businessLocation = "garland tx";
   //   const business = "microsoft";
   //   const businessLocation = "Redmond, WA";
-  //   const business = "dominos";
-  //   const businessLocation = "Milwaukee, WI";
+  //   const business = "georgios";
+  //   const businessLocation = "cleveland, oh";
   //   const businessNumber='(704) 793-1099'
   //   const businessNumber = "(414) 645-3303";
   const businessNameSelector = "#findTypeaheadInput";
@@ -57,7 +57,7 @@ async function run() {
       document
         .querySelectorAll(".dtm-search-listing-phone")
         .forEach(function(element) {
-          if (element.textContent === "(704) 793-1099") {
+          if (element.textContent === "(972) 271-9319") {
             element.parentNode.click();
           }
         })
@@ -94,20 +94,62 @@ async function run() {
       loadMoreVisible = await isElementVisible(page, loadMoreReviews);
     }
 
-    const customerReviews = await page.evaluate(() => {
-      let reviewsArray = [];
+    const reviewsArray = await page.evaluate(() => {
       let elements = document.getElementsByClassName(
         "jss2 styles__ReviewWrapper-sc-179a6lc-1 eXrTUG"
       );
 
-      for (let element of elements) {
-        console.log(element.textContent);
+      let reviewsArray = [];
+      for (let i = 0; i < elements.length; i++) {
+        let count;
+        if (elements[i].getElementsByClassName("iYZEDq").length > 0) {
+          count = 1;
+        } else if (elements[i].getElementsByClassName("cAwFMp").length > 0) {
+          count = 2;
+        } else if (elements[i].getElementsByClassName("iJcXOI").length > 0) {
+          count = 3;
+        } else if (elements[i].getElementsByClassName("foCBFt").length > 0) {
+          count = 5;
+        } else {
+          count = 4;
+        }
+
+        let obj = {
+          avatar:
+            "https://cdn.pixabay.com/photo/2017/02/25/22/04/user-icon-2098873_960_720.png",
+          body: elements[i].getElementsByClassName(
+            "jss214 jss222 jss241 styles__ReviewText-sc-179a6lc-0 leFlhE"
+          )[0].innerText,
+          author: elements[i].getElementsByClassName(
+            "jss2 styles__ReviewHeaderWrapper-sc-179a6lc-2 kvRMWi"
+          )[0].innerText,
+          time: Date.parse(
+            elements[i].getElementsByClassName("jss214 jss222")[0].innerText
+          ),
+          rank: count,
+          source: "BBB"
+        };
+
+        obj.author = obj.author.replace(/[^A-Za-z_ ]/g, "");
+        reviewsArray.push(obj);
       }
+      return reviewsArray;
     });
+    console.log(reviewsArray);
+    console.log(reviewsArray.length);
+    fs.writeFile("./googleDat.json", JSON.stringify(reviewsArray), err =>
+      err ? console.log(err) : console.log("FILE SAVED!")
+    );
     // browser.close();
   } catch (e) {
     console.log(e);
   }
 }
 
-run();
+// run();
+
+module.exports;
+
+module.exports.init = function() {
+  run();
+};
